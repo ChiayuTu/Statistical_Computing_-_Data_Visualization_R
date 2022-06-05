@@ -191,7 +191,8 @@ covid.usa.daily.m3
 #American Samoa       confirmed:6087
 ```
 
-![highly impacted states](C:\Users\tulou\Pictures\ScreenShot\Screenshot 2022-06-04 193924.png)
+![highly impacted states](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20193924.png)
+![mildly impacted states](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20193938.png)
 
 ##### 2. Create a visualization of the evolution of confirmed cases, deaths, and people vaccinated for each of the 6 states identified as highly and mildly impacted (use the covid.usa.states.ts data.frame to create the figure).
 
@@ -242,3 +243,194 @@ ggplot(data = vis_data) +
         plot.title = element_text(size = 15)) + 
   scale_color_discrete(name = "Cases", labels = "Death") 
 ```
+![the number of Confirmed cases, deaths, and fully vaccinated](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20195022.png)
+![Confirmed cases deaths](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20195040.png)
+
+##### 3. Do you see any interesting change in the trajectories of the corresponding time series for the number of cases and deaths taking place with vaccinations? Produce meaningful summaries that enable you to quantify this change (e.g., average number of new cases in windows of 90 days before vs 90 days after vaccination started). One or two summary measures is good. Make either a table or a figure to display your findings and comment on them.
+
+```
+#Create a function to find the average of cases and deaths for 90 days
+state.90.day.sums <- function(state, date1, date2, title){
+  covid.usa.states.ts %>%
+    filter(Province_State %in% c(state)) %>%
+    group_by(Dates >= date1 & Dates <= date2) %>%
+    summarise(
+      "Average Confirmed Cases" = mean(Confirmed, na.rm = TRUE),
+      "Average Deaths" = mean(Deaths, na.rm = TRUE)) %>% 
+    filter(`Dates >= date1 & Dates <= date2` == TRUE) %>%
+    select("Average Confirmed Cases", "Average Deaths") %>%
+    pivot_longer(cols = "Average Confirmed Cases":"Average Deaths",
+                 names_to = title)
+}
+
+# function that joins the before data with the after and creates a pretty table 
+state.90.day.join <- function(before, after, state){
+  before %>% 
+    select("ninety_days_before_vacc","value") %>%
+    left_join(after %>% select("ninety_days_after_vacc","value"),
+              by = c("ninety_days_before_vacc"="ninety_days_after_vacc")) %>%
+    rename("cases_v_deaths" = "ninety_days_before_vacc",
+           "ninety_days_before_vacc" = "value.x",
+           "ninety_days_after_vacc" = "value.y") %>%
+    gt() %>%
+    fmt_number(columns = vars(ninety_days_before_vacc), decimals = 2) %>%
+    fmt_number(columns = vars(ninety_days_after_vacc), decimals = 2) %>%
+    tab_header(
+      title = md(state),
+      subtitle = "Average Daily COVID Cases and Deaths 90 Days Before and After the Vaccine"
+    ) %>%
+    cols_label(
+      ninety_days_before_vacc = "90 Days Before Vaccine",
+      ninety_days_after_vacc  = "90 Days After Vaccine",
+      cases_v_deaths = "") 
+}
+
+# used covid.usa.states.ts data to find first data with data for "fully vaccinated"
+# used as.Date() +/- 90 to figure out dates 
+    
+#California
+before.CA <- state.90.day.sums("California","2021-02-08","2021-05-09", "ninety_days_before_vacc")
+after.CA <- state.90.day.sums("California","2021-05-10","2021-08-08", "ninety_days_after_vacc")
+CA.join <- state.90.day.join(before.CA, after.CA, "California")
+CA.join
+
+#Texas  
+before.Tx <- state.90.day.sums("Texas","2021-02-08","2021-05-09", "ninety_days_before_vacc")
+after.Tx <- state.90.day.sums("Texas","2021-05-10","2021-08-08", "ninety_days_after_vacc")
+Tx.join <- state.90.day.join(before.Tx, after.Tx, "Texas")
+Tx.join
+
+#Florida 
+before.Fl <- state.90.day.sums("Florida","2021-02-08","2021-05-09", "ninety_days_before_vacc")
+after.Fl <- state.90.day.sums("Florida","2021-05-10","2021-08-08", "ninety_days_after_vacc")
+Fl.join <- state.90.day.join(before.Fl, after.Fl, "Florida")
+Fl.join
+
+#Diamond Princess
+before.Dp <- state.90.day.sums("Diamond Princess","2021-02-08","2021-05-09", "ninety_days_before_vacc")
+after.Dp <- state.90.day.sums("Diamond Princess","2021-05-10","2021-08-08", "ninety_days_after_vacc")
+Dp.join <- state.90.day.join(before.Dp, after.Dp, "Diamond Princess")
+Dp.join
+
+#Grand Princess
+before.Gp <- state.90.day.sums("Grand Princess","2021-02-08","2021-05-09", "ninety_days_before_vacc")
+after.Gp <- state.90.day.sums("Grand Princess","2021-05-10","2021-08-08", "ninety_days_after_vacc")
+Gp.join <- state.90.day.join(before.Gp, after.Gp, "Grand Princess")
+Gp.join
+
+#American Samoa 
+before.As <- state.90.day.sums("American Samoa","2021-02-08","2021-05-09", "ninety_days_before_vacc")
+after.As <- state.90.day.sums("American Samoa","2021-05-10","2021-08-08", "ninety_days_after_vacc")
+As.join <- state.90.day.join(before.As, after.As, "American Samoa")
+As.join
+```
+
+##### 4. Choose two of your six states. Load their corresponding policy tracker data sets and use the relevant functions in the stringr package to extract policies related to any one of vaccination, mask or distancing.
+
+```
+policytrackerCA <- read_csv('https://raw.githubusercontent.com/govex/COVID-19/govex_data/data_tables/policy_data/table_data/Current/California_policy.csv')
+# view(policytrackerCA)
+#Vaccination policy in CA
+policytrackerCA.vacc <- policytrackerCA %>% 
+  select(date, policy) %>% 
+  mutate(policy = str_detect(policy, c("California", "vaccinations"))) %>% 
+  rename(TrueFalse = policy)
+#policytrackerCA.vacc
+policyCA.vacc <- policytrackerCA %>% 
+  select(date, policy) %>% 
+  full_join(policytrackerCA.vacc)
+policyCA.vacc %>% 
+  filter(TrueFalse == TRUE)
+#Mask policy in CA
+policytrackerCA.mask <- policytrackerCA %>% 
+  select(date, policy) %>% 
+  mutate(policy = str_detect(policy, c("California", "mask"))) %>% 
+  rename(TrueFalse = policy)
+#policytrackerCA.mask
+policyCA.mask <- policytrackerCA %>% 
+  select(date, policy) %>% 
+  full_join(policytrackerCA.mask)
+policyCA.mask %>% 
+  filter(TrueFalse == TRUE)
+#Distancing policy in CA
+policytrackerCA.dist <- policytrackerCA %>% 
+  select(date, policy) %>% 
+  mutate(policy = str_detect(policy, c("California", "distancing"))) %>% 
+  rename(TrueFalse = policy)
+#policytrackerCA.dist
+policyCA.dist <- policytrackerCA %>% 
+  select(date, policy) %>% 
+  full_join(policytrackerCA.dist)
+policyCA.dist %>% 
+  filter(TrueFalse == TRUE)
+
+#Texas Policy
+policytrackerTX <- read_csv('https://raw.githubusercontent.com/govex/COVID-19/govex_data/data_tables/policy_data/table_data/Current/Texas_policy.csv')
+#Vaccination policy in TX
+policytrackerTX.vacc <- policytrackerTX %>% 
+  select(date, policy) %>% 
+  mutate(policy = str_detect(policy, c("Texas", "vaccinations"))) %>% 
+  rename(TrueFalse = policy)
+#policytrackerTX.vacc
+policyTX.vacc <- policytrackerTX %>% 
+  select(date, policy) %>% 
+  full_join(policytrackerTX.vacc)
+policyTX.vacc %>% 
+  filter(TrueFalse == TRUE)
+#Mask policy in TX
+policytrackerTX.mask <- policytrackerTX %>% 
+  select(date, policy) %>% 
+  mutate(policy = str_detect(policy, c("Texas", "masks"))) %>% 
+  rename(TrueFalse = policy)
+#policytrackerTX.mask
+policyTX.mask <- policytrackerTX %>% 
+  select(date, policy) %>% 
+  full_join(policytrackerTX.mask)
+policyTX.mask %>% 
+  filter(TrueFalse == TRUE)
+#Distancing policy in TX
+policytrackerTX.dist <- policytrackerTX %>% 
+  select(date, policy) %>% 
+  mutate(policy = str_detect(policy, c("Texas", "distancing"))) %>% 
+  rename(TrueFalse = policy)
+#policytrackerTX.dist
+policyTX.dist <- policytrackerTX %>% 
+  select(date, policy) %>% 
+  full_join(policytrackerTX.dist)
+policyTX.dist %>% 
+  filter(TrueFalse == TRUE)
+  
+```
+
+##### 5. Get Creative: formulate and explore ONE question about the 3 highly and 3 mildly affected states with any of the data sets I have provided.
+
+```
+# select three highly impacted states
+highly_3 <- covid.usa.daily %>% 
+  arrange(desc(Confirmed)) %>% # reorder Confirmed column from highest to lowest
+  slice_head(n = 3)
+highly_3
+# select three mildly impacted states
+# (I wanted to include Oregon, so that's why I chose rows 21:23)
+mildly_3 <- covid.usa.daily %>%
+  arrange(desc(Confirmed)) %>% # reorder Confirmed column from lowest to highest
+  slice_tail(n = 3)
+mildly_3
+
+#
+affected_6_states <- union(highly_3, mildly_3) %>% # combine highly_3 and mildly_3
+  mutate(Pos_Prob = Confirmed/Total_Test_Results * 100) # calculate the percentage that people get positive results when tested for each state 
+
+# create graph
+ggplot() +
+  geom_col(data = affected_6_states,
+           aes(x = Province_State, y = Pos_Prob,
+               fill = Province_State)) +
+  xlab("States") + ylab("Probability") +
+  ggtitle("Percentage graph divided by states") +
+  theme_bw() +
+  labs(subtitle = "(the percentage that people will get the positive results when they tested )") + # added subtitle 
+  scale_fill_discrete(name = "States") # legend name
+```
+
+![Percentage graph divided by state](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20195746.png)
