@@ -191,8 +191,8 @@ covid.usa.daily.m3
 #American Samoa       confirmed:6087
 ```
 
-![highly impacted states](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20193924.png)
-![mildly impacted states](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20193938.png)
+![highly impacted states](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20Three/Screenshot%202022-06-04%20193924.png)
+![mildly impacted states](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20Three/Screenshot%202022-06-04%20193938.png)
 
 ##### 2. Create a visualization of the evolution of confirmed cases, deaths, and people vaccinated for each of the 6 states identified as highly and mildly impacted (use the covid.usa.states.ts data.frame to create the figure).
 
@@ -243,8 +243,8 @@ ggplot(data = vis_data) +
         plot.title = element_text(size = 15)) + 
   scale_color_discrete(name = "Cases", labels = "Death") 
 ```
-![the number of Confirmed cases, deaths, and fully vaccinated](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20195022.png)
-![Confirmed cases deaths](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20195040.png)
+![the number of Confirmed cases, deaths, and fully vaccinated](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20Three/Screenshot%202022-06-04%20195022.png)
+![Confirmed cases deaths](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20Three/Screenshot%202022-06-04%20195040.png)
 
 ##### 3. Do you see any interesting change in the trajectories of the corresponding time series for the number of cases and deaths taking place with vaccinations? Produce meaningful summaries that enable you to quantify this change (e.g., average number of new cases in windows of 90 days before vs 90 days after vaccination started). One or two summary measures is good. Make either a table or a figure to display your findings and comment on them.
 
@@ -433,4 +433,4 @@ ggplot() +
   scale_fill_discrete(name = "States") # legend name
 ```
 
-![Percentage graph divided by state](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20One/Screenshot%202022-06-04%20195746.png)
+![Percentage graph divided by state](https://github.com/ChiayuTu/Statistical_Computing_-_Data_Visualization_R/blob/main/Assignment%20Three/Screenshot%202022-06-04%20195746.png)
