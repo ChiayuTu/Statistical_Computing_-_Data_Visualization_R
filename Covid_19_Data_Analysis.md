@@ -29,3 +29,4 @@ At this point of the term you have an R toolbox broad enough to tackle the massi
 4. Vaccination data: state level COVID-19 daily vaccination numbers time series data from the Johns Hopkins University repository (file description here, )
 
 5. State policy data: data files (one file by state) about dates and description of policies going into/out of effect. To load data for a particular state go to this link, find the name of the state file you want to work with. For example if you want to load data from California, use
+
